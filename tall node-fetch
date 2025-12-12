@@ -1,0 +1,75 @@
+[33mcommit a3eb650bb092f78ccf61591109851467cdeda8b4[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Eljie D. Mag-aso <eljie.magaso@ctug.edu>
+Date:   Fri Dec 12 14:49:23 2025 +0800
+
+    Initial portfolio commit
+
+[1mdiff --git a/netlify/functions/gemini-chat.js b/netlify/functions/gemini-chat.js[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0bc4bdf[m
+[1m--- /dev/null[m
+[1m+++ b/netlify/functions/gemini-chat.js[m
+[36m@@ -0,0 +1,62 @@[m
+[32m+[m[32mconst fetch = require('node-fetch')[m
+[32m+[m
+[32m+[m
+[32m+[m[32mexports.handler = async function(event, context) {[m
+[32m+[m[32mtry{[m
+[32m+[m[32mif (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' }[m
+[32m+[m
+[32m+[m
+[32m+[m[32mconst body = JSON.parse(event.body || '{}')[m
+[32m+[m[32mconst messages = body.messages || [][m
+[32m+[m
+[32m+[m
+[32m+[m[32m// Build a helpful system prompt that contains your personal 'facts' so the assistant can answer about you.[m
+[32m+[m[32m// IMPORTANT: Edit the `PERSONAL_KB` string below with factual information about yourself.[m
+[32m+[m[32mconst PERSONAL_KB = `Name: John Miguel Santos[m
+[32m+[m[32mTitle: Frontend Developer & UI/UX Enthusiast[m
+[32m+[m[32mSkills: React, JavaScript, TypeScript, TailwindCSS, Node.js, UI Design, UX Research[m
+[32m+[m[32mLocation: Manila, Philippines[m
+[32m+[m[32mBio: I’m a passionate frontend developer who focuses on building beautiful, functional, and user-centered web applications. I enjoy crafting smooth UI experiences, optimizing performance, and translating ideas into clean code. I’ve worked on personal projects, freelancing work, and open-source contributions. Outside of coding, I love design, photography, and continuous learning.[m
+[32m+[m[32mProjects:[m
+[32m+[m[32m- Portfolio Website: A personal portfolio built with React and TailwindCSS.[m
+[32m+[m[32m- TaskFlow App: A productivity and task management web app using React + Firebase.[m
+[32m+[m[32m- UI Component Library: A small reusable UI kit designed in Figma and implemented in React.[m
+[32m+[m
+[32m+[m[32mSocial Links:[m
+[32m+[m[32mGitHub: https://github.com/jm-santos[m
+[32m+[m[32mLinkedIn: https://linkedin.com/in/jm-santos[m
+[32m+[m[32mPortfolio: https://jm-santos.dev[m
+[32m+[m[32m`[m
+[32m+[m
+[32m+[m
+[32m+[m[32mconst prompt = `You are an assistant that answers visitor questions specifically about the portfolio owner. Use the personal facts below to ground your answers. If the visitor asks for opinions or generic topics, answer naturally.\n\nPersonal facts:\n${PERSONAL_KB}\n\nConversation:\n` + messages.map(m => `${m.role}: ${m.text}`).join('\n') + '\nAssistant:'[m
+[32m+[m
+[32m+[m
+[32m+[m[32mconst API_KEY = process.env.GEMINI_API_KEY[m
+[32m+[m[32mif(!API_KEY) return { statusCode: 500, body: 'GEMINI_API_KEY not configured' }[m
+[32m+[m
+[32m+[m
+[32m+[m[32m// Example: call the Gemini REST completions endpoint[m
+[32m+[m[32mconst res = await fetch('https://api.generativeai.google/v1beta2/models/text-bison-001:generate', {[m
+[32m+[m[32mmethod: 'POST',[m
+[32m+[m[32mheaders: {[m
+[32m+[m[32m'Content-Type': 'application/json',[m
+[32m+[m[32m'Authorization': `Bearer ${API_KEY}`[m
+[32m+[m[32m},[m
+[32m+[m[32mbody: JSON.stringify({[m
+[32m+[m[32mprompt: {text: prompt},[m
+[32m+[m[32mmaxOutputTokens: 450[m
+[32m+[m[32m})[m
+[32m+[m[32m})[m
+[32m+[m
+[32m+[m
+[32m+[m[32mconst data = await res.json()[m
+[32m+[m[32mconst reply = (data?.candidates?.[0]?.content) || data?.output?.[0]?.content || JSON.stringify(data)[m
+[32m+[m
+[32m+[m
+[32m+[m[32mreturn { statusCode: 200, body: JSON.stringify({ reply }) }[m
+[32m+[m[32m}catch(err){[m
+[32m+[m[32mconsole.error(err)[m
+[32m+[m[32mreturn { statusCode: 500, body: 'Internal error' }[m
+[32m+[m[32m}[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
