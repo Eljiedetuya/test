@@ -1,10 +1,10 @@
 [build]
-command = "npm run build"
-publish = "dist"
-functions = "netlify/functions"
-
+  command = "npm run build"
+  publish = "dist"
+  node_version = "18"
 
 [[redirects]]
-from = "/api/*"
-to = "/.netlify/functions/:splat"
-status = 200
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+cat package-lock.json | grep node-fetch
